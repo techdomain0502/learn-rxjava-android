@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var textView: TextView
 
+    private lateinit var compositeDisposable: CompositeDisposable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         greetObservable = Observable.just("hello from rxjava")
 
+        compositeDisposable = CompositeDisposable()
 
         greetObserver = object : DisposableObserver<String>() {
 
@@ -78,12 +80,17 @@ class MainActivity : AppCompatActivity() {
         greetObservable
             .subscribe(greetObserver2)
 
+
+        //adding all observers to compositedisposable and they are disposableobserver, right!
+        compositeDisposable.add(greetObserver)
+        compositeDisposable.add(greetObserver2)
+
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        greetObserver.dispose()
-        greetObserver2.dispose()
+        //clear the holder of all added disposable observers and dispose them too
+        compositeDisposable.clear()
     }
 }
