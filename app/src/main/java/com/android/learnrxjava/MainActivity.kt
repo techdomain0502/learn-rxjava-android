@@ -18,9 +18,9 @@ class MainActivity : AppCompatActivity() {
     val tag = MainActivity::class.java.simpleName + "_log"
 
     //using Observable<T>.just to get observable from string data stream
-    private lateinit var greetObservable: Observable<String>
+    private lateinit var greetObservable: Observable<Int>
 
-    private lateinit var greetObserver: DisposableObserver<String>
+    private lateinit var greetObserver: DisposableObserver<Int>
 
     private lateinit var textView: TextView
 
@@ -34,11 +34,11 @@ class MainActivity : AppCompatActivity() {
 
         textView = findViewById(R.id.textview)
 
-        greetObservable = Observable.fromArray(*dataArray)
+        greetObservable = Observable.range(0,10)
 
         compositeDisposable = CompositeDisposable()
 
-        greetObserver = object:DisposableObserver<String>(){
+        greetObserver = object:DisposableObserver<Int>(){
 
 
             override fun onError(e: Throwable?) {
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                 Logger.logd(tag,"onComplete")
             }
 
-            override fun onNext(t: String) {
+            override fun onNext(t: Int) {
                 Logger.logd(tag,"${t}")
             }
 
