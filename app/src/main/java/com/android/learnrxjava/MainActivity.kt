@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .skip(2)
+            .skipLast(2)
             .subscribe(observer)
 
         }
