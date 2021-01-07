@@ -8,7 +8,13 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.android.learnrxjava.utils.Logger
+import com.jakewharton.rxbinding2.view.RxView
+import com.jakewharton.rxbinding2.widget.RxTextView
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
+import java.util.function.Consumer
 
 class RxBindingDemo : AppCompatActivity() {
 
@@ -24,7 +30,20 @@ class RxBindingDemo : AppCompatActivity() {
         button = findViewById(R.id.button)
         textView = findViewById(R.id.textview)
 
+        //with rxbinding
 
+        RxTextView.textChanges(editText).subscribe {
+                     textView.text = it.toString()
+        }
+
+        RxView.clicks(button).subscribe{
+            textView.text = ""
+            editText.setText("")
+        }
+
+
+/*
+        //without rxbinding
         editText.addTextChangedListener(object:TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -46,7 +65,7 @@ class RxBindingDemo : AppCompatActivity() {
                 textView.setText("")
             }
 
-        })
+        })*/
 
     }
 }
