@@ -22,11 +22,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var greetObserver: DisposableObserver<String>
 
-    private lateinit var greetObserver2: DisposableObserver<String>
-
     private lateinit var textView: TextView
 
     private lateinit var compositeDisposable: CompositeDisposable
+
+    private val dataArray = arrayOf("1","2")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,63 +34,37 @@ class MainActivity : AppCompatActivity() {
 
         textView = findViewById(R.id.textview)
 
-        greetObservable = Observable.just("hello from rxjava")
+        greetObservable = Observable.fromArray(*dataArray)
 
         compositeDisposable = CompositeDisposable()
 
-        greetObserver = object : DisposableObserver<String>() {
+        greetObserver = object:DisposableObserver<String>(){
 
-            override fun onNext(t: String?) {
-                Logger.logd(tag, "greetobserver1 onnext ${t} ${Thread.currentThread().name}")
-                textView.text = t
-            }
 
             override fun onError(e: Throwable?) {
-                Logger.logd(tag, "greetobserver1  onerror ${Thread.currentThread().name}")
+                Logger.logd(tag,"onError")
             }
 
             override fun onComplete() {
-                Logger.logd(tag, "greetobserver1 oncomplete ${Thread.currentThread().name}")
+                Logger.logd(tag,"onComplete")
+            }
+
+            override fun onNext(t: String) {
+                Logger.logd(tag,"${t}")
             }
 
         }
-
         greetObservable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(greetObserver)
-
-        //add one more observer
-        greetObserver2 = object : DisposableObserver<String>() {
-
-            override fun onNext(t: String?) {
-                Logger.logd(tag, "greetobserver2 onnext ${t} ${Thread.currentThread().name}")
-                textView.text = t
-            }
-
-            override fun onError(e: Throwable?) {
-                Logger.logd(tag, "greetobserver2  onerror ${Thread.currentThread().name}")
-            }
-
-            override fun onComplete() {
-                Logger.logd(tag, "greetobserver2 oncomplete ${Thread.currentThread().name}")
-            }
-
-        }
-     // lets subscribe the observer 2
-        greetObservable
-            .subscribe(greetObserver2)
+            .subscribeWith(greetObserver)
 
 
-        //adding all observers to compositedisposable and they are disposableobserver, right!
-        compositeDisposable.add(greetObserver)
-        compositeDisposable.add(greetObserver2)
 
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        //clear the holder of all added disposable observers and dispose them too
         compositeDisposable.clear()
     }
 }
