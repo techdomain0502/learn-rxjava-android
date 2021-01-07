@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.schedulers.Schedulers
 
@@ -67,8 +68,14 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-        greetObservable.subscribeOn(Schedulers.io())
+        greetObservable
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .map {
+                student -> student.name = student.name.toUpperCase()
+                student
+            }
+
             .subscribeWith(greetObserver)
 
 
