@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.AsyncSubject
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.ReplaySubject
 
 class MainActivity : AppCompatActivity() {
 
@@ -134,7 +135,7 @@ class MainActivity : AppCompatActivity() {
 
 */
 
-        val publishSubject = PublishSubject.create<String>()
+ /*       val publishSubject = PublishSubject.create<String>()
         getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe(publishSubject)
 
@@ -151,8 +152,27 @@ class MainActivity : AppCompatActivity() {
         publishSubject.onComplete()
 
         //observer 3 couldnt get any as subject is completed above
-        publishSubject.subscribe(getObserver_3())
+        publishSubject.subscribe(getObserver_3())*/
 
+
+        val replaySubject = ReplaySubject.create<String>()
+        getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(replaySubject)
+
+        //observer 1 gets  b, c , d
+        replaySubject.onNext("a")
+        replaySubject.subscribe(getObserver_1())
+        replaySubject.onNext("b")
+        replaySubject.onNext("c")
+
+        //observer 2 gets d
+        replaySubject.subscribe(getObserver_2())
+        replaySubject.onNext("d")
+        //subject completed emitting
+        replaySubject.onComplete()
+
+        //observer 3 couldnt get any as subject is completed above
+        replaySubject.subscribe(getObserver_3())
     }
 
     }
