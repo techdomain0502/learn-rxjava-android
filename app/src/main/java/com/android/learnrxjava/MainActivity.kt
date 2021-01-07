@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.AsyncSubject
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
 
 class MainActivity : AppCompatActivity() {
 
@@ -111,6 +112,7 @@ class MainActivity : AppCompatActivity() {
         // it will receive b even complete is invoked above
         asyncSubject.subscribe(observer2)
 */
+/*
         val behaviorSubject = BehaviorSubject.create<String>()
         getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe(behaviorSubject)
@@ -129,6 +131,27 @@ class MainActivity : AppCompatActivity() {
 
         //observer 3 couldnt get any as subject is completed above
         behaviorSubject.subscribe(getObserver_3())
+
+*/
+
+        val publishSubject = PublishSubject.create<String>()
+        getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(publishSubject)
+
+        //observer 1 gets  b, c , d
+        publishSubject.onNext("a")
+        publishSubject.subscribe(getObserver_1())
+        publishSubject.onNext("b")
+        publishSubject.onNext("c")
+
+        //observer 2 gets d
+        publishSubject.subscribe(getObserver_2())
+        publishSubject.onNext("d")
+        //subject completed emitting
+        publishSubject.onComplete()
+
+        //observer 3 couldnt get any as subject is completed above
+        publishSubject.subscribe(getObserver_3())
 
     }
 
