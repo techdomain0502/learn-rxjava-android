@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         greetObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .flatMap {
+            .concatMap {
 
                 student -> student.name = student.name.toUpperCase()
                 val student1 = Student("another student",22)
