@@ -19,81 +19,39 @@ class MainActivity : AppCompatActivity() {
 
     val tag = MainActivity::class.java.simpleName + "_log"
 
-    //using Observable<T>.just to get observable from string data stream
-    private lateinit var greetObservable: Observable<Student>
-
-    private lateinit var greetObserver: DisposableObserver<Student>
-
-    private lateinit var textView: TextView
-
-    private lateinit var compositeDisposable: CompositeDisposable
-
-    private lateinit var studentArrayList: ArrayList<Student>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        textView = findViewById(R.id.textview)
-
-        addStudents()
-
-        greetObservable = Observable.create {
-            emitter-> studentArrayList.forEach { student->
-            emitter.onNext(student)
+        val observable:Observable<Int> = Observable.range(0,10)
+        val observer:Observer<List<Int>> = object:Observer<List<Int>>{
+            override fun onSubscribe(d: Disposable?) {
+            Logger.logd(tag,"onsubscribe called")
             }
 
-            //finish notify after stream is empty
-            emitter.onComplete()
-
-          // will cause fatal exception, so throw it wisely
-        //    emitter.onError(throw Exception("dummy error"))
-        }
-
-        compositeDisposable = CompositeDisposable()
-
-        greetObserver = object : DisposableObserver<Student>() {
-
+            override fun onNext(t: List<Int>) {
+                t.forEach {
+                    Logger.logd(tag," $it")
+                }
+                Logger.logd(tag,"-------")
+            }
 
             override fun onError(e: Throwable?) {
-                Logger.logd(tag, "onError")
             }
 
             override fun onComplete() {
-                Logger.logd(tag, "onComplete")
-            }
-
-            override fun onNext(t: Student) {
-                Logger.logd(tag, "${t}")
+                Logger.logd(tag,"oncomplete called")
             }
 
         }
-        greetObservable
-            .subscribeOn(Schedulers.io())
+
+        observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .concatMap {
-
-                student -> student.name = student.name.toUpperCase()
-                val student1 = Student("another student",22)
-                Observable.just(student,student1)
-
-            }
-
-            .subscribeWith(greetObserver)
+            .buffer(3)
+            .subscribe(observer)
 
 
     }
 
-    private fun addStudents() {
-        studentArrayList = ArrayList()
-        studentArrayList.add(Student("sachin", 34))
-        studentArrayList.add(Student("erik", 32))
-        studentArrayList.add(Student("ferado", 22))
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.clear()
-    }
 }
