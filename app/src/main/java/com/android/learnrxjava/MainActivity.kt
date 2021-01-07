@@ -24,37 +24,32 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val observable:Observable<Int> = Observable.range(0,20)
-        val observer:Observer<List<Int>> = object:Observer<List<Int>>{
+        val observable:Observable<Int> = Observable.just(1,2,3,4,4,3)
+        val observer:Observer<Int> = object:Observer<Int>{
             override fun onSubscribe(d: Disposable?) {
             Logger.logd(tag,"onsubscribe called")
             }
 
-            override fun onNext(t: List<Int>) {
-                t.forEach {
-                    Logger.logd(tag," $it")
+            override fun onNext(t: Int) {
+                    Logger.logd(tag," $t")
                 }
-                Logger.logd(tag,"-------")
-            }
 
             override fun onError(e: Throwable?) {
             }
 
             override fun onComplete() {
-                Logger.logd(tag,"oncomplete called")
             }
-
         }
 
         observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .filter {
-                it%2==0
-            }
-            .buffer(2)
+            .distinct()
             .subscribe(observer)
+
+        }
+
+
 
 
     }
 
-}
