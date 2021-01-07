@@ -15,6 +15,7 @@ import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.observers.DisposableObserver
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.AsyncSubject
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class MainActivity : AppCompatActivity() {
 
@@ -78,7 +79,13 @@ class MainActivity : AppCompatActivity() {
         val asyncSubject:AsyncSubject<String> = AsyncSubject.create()
         getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe(asyncSubject)
+
         asyncSubject.subscribe(observer1)
+        asyncSubject.onNext("a")
+        asyncSubject.onNext("b")
+        asyncSubject.onComplete()
+//        asyncSubject.onNext("c")
+        // it will receive b even complete is invoked above
         asyncSubject.subscribe(observer2)
 
         }
