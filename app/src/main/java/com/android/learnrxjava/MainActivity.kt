@@ -71,9 +71,12 @@ class MainActivity : AppCompatActivity() {
         greetObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .map {
+            .flatMap {
+
                 student -> student.name = student.name.toUpperCase()
-                student
+                val student1 = Student("another student",22)
+                Observable.just(student,student1)
+
             }
 
             .subscribeWith(greetObserver)
