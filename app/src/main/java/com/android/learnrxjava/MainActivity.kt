@@ -63,6 +63,29 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
+    fun getObserver_3():Observer<String>{
+        return object:Observer<String>{
+            override fun onSubscribe(d: Disposable?) {
+                Logger.logd(tag,"observer 3 onsubscribe")
+            }
+
+            override fun onNext(t: String?) {
+                Logger.logd(tag,"observer 3 onnext ${t}")
+            }
+
+            override fun onError(e: Throwable?) {
+                Logger.logd(tag,"observer 3 onerror")
+            }
+
+            override fun onComplete() {
+                Logger.logd(tag,"observer 3 oncomplete")
+            }
+
+        }
+    }
+
+
+
     fun getObservable():Observable<String>{
         var arr = arrayOf("a","b","c")
         return Observable.fromArray(*arr)
@@ -76,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         val observer1 = getObserver_1()
         val observer2 = getObserver_2()
 
-        val asyncSubject:AsyncSubject<String> = AsyncSubject.create()
+        /*val asyncSubject:AsyncSubject<String> = AsyncSubject.create()
         getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe(asyncSubject)
 
@@ -87,8 +110,27 @@ class MainActivity : AppCompatActivity() {
 //        asyncSubject.onNext("c")
         // it will receive b even complete is invoked above
         asyncSubject.subscribe(observer2)
+*/
+        val behaviorSubject = BehaviorSubject.create<String>()
+        getObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(behaviorSubject)
 
-        }
+        //observer 1 gets most recent ie. a and thereafter b, c
+        behaviorSubject.onNext("a")
+        behaviorSubject.subscribe(getObserver_1())
+        behaviorSubject.onNext("b")
+        behaviorSubject.onNext("c")
+
+        //observer 2 gets most recent ie. c and thereafter if any
+        behaviorSubject.subscribe(getObserver_2())
+
+        //subject completed emitting
+        behaviorSubject.onComplete()
+
+        //observer 3 couldnt get any as subject is completed above
+        behaviorSubject.subscribe(getObserver_3())
+
+    }
 
     }
 
