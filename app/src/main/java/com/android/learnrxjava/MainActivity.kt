@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val observable:Observable<Int> = Observable.just(1,2,3,4,4,3)
+        val observable:Observable<Int> = Observable.just(1,2,3,4,5)
         val observer:Observer<Int> = object:Observer<Int>{
             override fun onSubscribe(d: Disposable?) {
             Logger.logd(tag,"onsubscribe called")
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .distinct()
+            .skip(2)
             .subscribe(observer)
 
         }
