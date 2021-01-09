@@ -17,7 +17,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import java.util.function.Consumer
 
 class RxBindingDemo : AppCompatActivity() {
-
+//
     private lateinit var textView: TextView
     private lateinit var button: Button
     private lateinit var editText: EditText
