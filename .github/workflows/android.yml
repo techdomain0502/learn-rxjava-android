@@ -2,9 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ todolist-rxjava ]
   pull_request:
-    branches: [ master ]
+    branches: [ todolist-rxjava ]
 
 jobs:
   build:
