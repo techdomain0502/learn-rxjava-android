@@ -4,6 +4,11 @@ plugins {
 }
 
 android {
+
+    lintOptions {
+        abortOnError false
+    }
+
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
 
