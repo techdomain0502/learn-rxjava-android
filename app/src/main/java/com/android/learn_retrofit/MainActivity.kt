@@ -21,45 +21,50 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
-    val TAG:String = "MainActivity_log"
+    val TAG: String = "MainActivity_log"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
 
         val retrofitInstance = RetrofitInstance()
-        val progressBar:ProgressBar = findViewById(R.id.progressbar)
+        val progressBar: ProgressBar = findViewById(R.id.progressbar)
         retrofitInstance.getCountryServiceApi()
-            ?.run {
-             getAllCountries()
-                 .subscribeOn(Schedulers.io())
-                 .observeOn(AndroidSchedulers.mainThread())
-            }?.flatMap {
-               Log.d(TAG,"flat map called")
-                val countryArray = it.toTypedArray()
-                 Observable.fromArray(*countryArray)
+                ?.run {
+                    getAllCountries()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .flatMap {
+                                Log.d(TAG, "flat map called")
+                                val countryArray = it.toTypedArray()
+                                Observable.fromArray(*countryArray)
+                            }
+                            //.skip(249)
+                            .filter {
+                                it.name.startsWith("U")
+                            }
+                            .subscribe(object : Observer<CountryItem> {
+                                override fun onSubscribe(d: Disposable) {
+                                    Log.d(TAG, "onsubscribe called")
+                                    progressBar.visibility = View.VISIBLE
+                                }
+
+                                override fun onNext(t: CountryItem) {
+                                    Log.d(TAG, "onnext called ${t}")
+                                }
+
+                                override fun onError(e: Throwable) {
+                                    TODO("Not yet implemented")
+                                }
+
+                                override fun onComplete() {
+                                    Log.d(TAG, "oncomplete")
+                                    progressBar.visibility = View.INVISIBLE
+                                }
+
+                            })
+
+
                 }
-                ?.subscribe(object:Observer<CountryItem>{
-                    override fun onSubscribe(d: Disposable) {
-                        Log.d(TAG,"onsubscribe called")
-                        progressBar.visibility = View.VISIBLE
-                    }
-
-                    override fun onNext(t: CountryItem) {
-                        Log.d(TAG,"onnext called ${t}")
-                    }
-
-                    override fun onError(e: Throwable) {
-                        TODO("Not yet implemented")
-                    }
-
-                    override fun onComplete() {
-                        Log.d(TAG,"oncomplete")
-                        progressBar.visibility = View.INVISIBLE
-                    }
-
-                })
-
-
 
 
     }
