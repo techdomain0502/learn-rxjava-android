@@ -6,7 +6,7 @@ import io.reactivex.Observable
 @Dao
 interface CountryDao {
   @Query("Select * from Country")
-  fun getAll():Observable<List<Country>>
+  fun getAll():List<Country>
 
   @Query("Select * from Country where country_name like :name")
   fun getCountryDetails(name:String):Country

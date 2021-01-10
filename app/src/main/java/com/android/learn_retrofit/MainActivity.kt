@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var db:RoomDatabase
     lateinit var countryDao: CountryDao
     lateinit var compositeDisposable: CompositeDisposable
+    val retrofitInstance = RetrofitInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +42,6 @@ class MainActivity : AppCompatActivity() {
         db = Room.databaseBuilder(this,MyDatabase::class.java,"countrydB").build()
         countryDao = (db as MyDatabase).countryDao()
 
-        val retrofitInstance = RetrofitInstance()
         val progressBar: ProgressBar = findViewById(R.id.progressbar)
 
         retrofitInstance.getCountryServiceApi()
@@ -94,39 +94,40 @@ class MainActivity : AppCompatActivity() {
 
         GlobalScope.launch {
           val ob = getCountries()
-
-          ob.subscribeOn(Schedulers.io())
-              .observeOn(AndroidSchedulers.mainThread())
-              .subscribe(object: Observer<List<com.android.learn_retrofit.db.Country>> {
-
-
-                  override fun onNext(t: List<com.android.learn_retrofit.db.Country>) {
-                      Log.d(TAG,"size = ${t.size}")
-                  }
-
-                  override fun onError(e: Throwable) {
-                      Log.d(TAG,"onerror in coroutine")
-                  }
-
-                  override fun onComplete() {
-                      Log.d(TAG,"oncomplete in coroutine")
-                  }
-
-                  override fun onSubscribe(d: Disposable) {
-                      compositeDisposable.add(d)
-                  }
-
-              })
-
+          Log.d(TAG,"global scope end1 "+ob.size)
         }
+
+       GlobalScope.launch {
+           val ob = getCountries_coroutinesway()
+           ob.enqueue(object:Callback<Country>{
+               override fun onResponse(call: Call<Country>, response: Response<Country>) {
+                   Log.d(TAG,"global scope end2 "+response.body()?.size)    }
+
+               override fun onFailure(call: Call<Country>, t: Throwable) {
+                   Log.d(TAG,"onfailure in retrofit callback")
+               }
+
+           })
+
+       }
+
+
 
 
     }
 
-    suspend fun getCountries():Observable<List<com.android.learn_retrofit.db.Country>>{
+    suspend fun getCountries():List<com.android.learn_retrofit.db.Country>{
             return withContext(Dispatchers.IO){
+
                 return@withContext countryDao.getAll()
             }
+    }
+
+    suspend fun getCountries_coroutinesway():Call<Country>{
+        return withContext(Dispatchers.IO){
+
+            return@withContext retrofitInstance.getCountryServiceApi()?.getAllCountries_coroutinesway()!!
+        }
     }
 
     override fun onStop() {

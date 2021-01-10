@@ -10,4 +10,7 @@ interface GetCountryService {
 
     @GET("rest/v2/all")
     fun getAllCountries(): Observable<Country>
+
+    @GET("rest/v2/all")
+    fun getAllCountries_coroutinesway(): Call<Country>
 }
